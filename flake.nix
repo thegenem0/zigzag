@@ -1,4 +1,5 @@
 {
+  description = "Zig-Zoom";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -16,25 +17,20 @@
         devShells.default = mkShell
           {
             buildInputs = [
+              glfw
               glew
-              glfw3
-              gcc
-              zig_0_13
-              zls
-              wayland-scanner
-              libGL
-              libGLU
-              freeglut
-              wayland
-              mesa
-              mesa.drivers
+              zsh
             ];
+
             shellHook = ''
-              export GBM_BACKEND=nvidia-drm
               export EGL_PLATFORM=wayland
-              export __GLX_VENDOR_LIBRARY_NAME=nvidia
               export GLFW_USE_WAYLAND=1
-              export LD_LIBRARY_PATH="${libGL}/lib:${libGLU}/lib:${freeglut}/lib:${glfw}/lib:${wayland}/lib"
+              export LD_LIBRARY_PATH="${glew}/lib"
+
+              if [ -z "$IN_ZSH" ]; then
+                export IN_ZSH=1
+                exec zsh
+              fi
             '';
           };
       }

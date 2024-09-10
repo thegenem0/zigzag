@@ -1,33 +1,13 @@
 const std = @import("std");
+const Window = @import("window.zig");
+
 const c = @cImport({
-    @cInclude("GLFW/glfw3.h");
+    @cInclude("glad/glad.h");
 });
 
-export fn errorCallback(_: c_int, description: [*c]const u8) void {
-    std.debug.panic("Error: {s}\n", .{description});
-}
-
 pub fn main() anyerror!void {
-    if (c.glfwInit() == 0) {
-        std.debug.print("Failed to initialize GLFW\n", .{});
-        return;
-    }
+    const window = try Window.createWindow(640, 480, "Hello, Zig!");
+    defer Window.destroyWindow(window);
 
-    _ = c.glfwSetErrorCallback(errorCallback);
-
-    const window = c.glfwCreateWindow(640, 480, "Hello, Zig!", null, null) orelse {
-        std.debug.print("Failed to create GLFW window\n", .{});
-        c.glfwTerminate();
-        return;
-    };
-
-    c.glfwMakeContextCurrent(window);
-
-    while (c.glfwWindowShouldClose(window) == 0) {
-        c.glfwSwapBuffers(window);
-        c.glfwPollEvents();
-    }
-
-    c.glfwDestroyWindow(window);
-    c.glfwTerminate();
+    try Window.runWindowLoop(window);
 }

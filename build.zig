@@ -5,15 +5,6 @@ pub fn build(b: *std.Build) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addStaticLibrary(.{
-        .name = "zigzoom",
-        .root_source_file = b.path("src/root.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
-    b.installArtifact(lib);
-
     const exe = b.addExecutable(.{
         .name = "zigzoom",
         .root_source_file = b.path("src/main.zig"),
@@ -21,11 +12,14 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    exe.addCSourceFile(.{
+        .file = b.path("libs/glad/src/glad.c"),
+    });
+
+    exe.addIncludePath(b.path("libs/glad/include"));
+
     exe.linkSystemLibrary("glfw");
-    exe.linkSystemLibrary("wayland-client");
-    exe.linkSystemLibrary("wayland-cursor");
-    exe.linkSystemLibrary("wayland-egl");
-    exe.linkSystemLibrary("EGL");
+    exe.linkSystemLibrary("GL");
     exe.linkLibC();
 
     b.installArtifact(exe);
